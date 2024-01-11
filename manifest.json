@@ -1,0 +1,7 @@
+{
+  "name": "Pip",
+  "description": "PIP mode for spotify",
+  "preview": "assets/preview.png",
+  "main": "src/app.tsx",
+  "readme": "README.md"
+}
