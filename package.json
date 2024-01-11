@@ -1,0 +1,24 @@
+{
+  "name": "pip",
+  "version": "0.1.0",
+  "author": "H3r3zy (https://github.com/H3r3zy)",
+  "homepage": "https://github.com/H3r3zy/spicetify-pip",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/H3r3zy/spicetify-pip"
+  },
+  "bugs": {
+    "url": "https://github.com/H3r3zy/spicetify-pip/issues"
+  },
+  "scripts": {
+    "build": "spicetify-creator",
+    "build-local": "spicetify-creator --out=dist --minify",
+    "watch": "spicetify-creator --watch"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@types/react": "^18.2.47",
+    "@types/react-dom": "^18.2.18",
+    "spicetify-creator": "^1.0.17"
+  }
+}
