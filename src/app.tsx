@@ -1,5 +1,5 @@
 async function main() {
-  while (!Spicetify?.Player || !Spicetify?.Playbar?.Button) {
+  while (!Spicetify?.Player || !Spicetify?.Playbar?.Button || !Spicetify?.Player?.data?.item) {
     await new Promise(resolve => setTimeout(resolve, 100));
   }
 
@@ -9,6 +9,16 @@ async function main() {
   const video = document.createElement('video');
   video.srcObject = canvas.captureStream();
   video.controls = true;
+
+  await changeCanvasTrack();
+
+  let metadataLoaded = false;
+  video.onloadedmetadata = () => {
+    metadataLoaded = true;
+  };
+  while (!metadataLoaded) {
+    await new Promise(resolve => setTimeout(resolve, 100));
+  }
 
   function getAlbumImg() {
     const track = Spicetify.Player.data.item;

@@ -5,8 +5,8 @@
         var pip = (() => {
   // src/app.tsx
   async function main() {
-    var _a;
-    while (!(Spicetify == null ? void 0 : Spicetify.Player) || !((_a = Spicetify == null ? void 0 : Spicetify.Playbar) == null ? void 0 : _a.Button)) {
+    var _a, _b, _c;
+    while (!(Spicetify == null ? void 0 : Spicetify.Player) || !((_a = Spicetify == null ? void 0 : Spicetify.Playbar) == null ? void 0 : _a.Button) || !((_c = (_b = Spicetify == null ? void 0 : Spicetify.Player) == null ? void 0 : _b.data) == null ? void 0 : _c.item)) {
       await new Promise((resolve) => setTimeout(resolve, 100));
     }
     const canvas = document.createElement("canvas");
@@ -14,10 +14,18 @@
     const video = document.createElement("video");
     video.srcObject = canvas.captureStream();
     video.controls = true;
+    await changeCanvasTrack();
+    let metadataLoaded = false;
+    video.onloadedmetadata = () => {
+      metadataLoaded = true;
+    };
+    while (!metadataLoaded) {
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    }
     function getAlbumImg() {
-      var _a2, _b, _c;
+      var _a2, _b2, _c2;
       const track = Spicetify.Player.data.item;
-      return (_c = (_b = (_a2 = track.images) == null ? void 0 : _a2.find((e) => e.label === "standard")) == null ? void 0 : _b.url) == null ? void 0 : _c.replaceAll("spotify:image:", "https://i.scdn.co/image/");
+      return (_c2 = (_b2 = (_a2 = track.images) == null ? void 0 : _a2.find((e) => e.label === "standard")) == null ? void 0 : _b2.url) == null ? void 0 : _c2.replaceAll("spotify:image:", "https://i.scdn.co/image/");
     }
     function setMediaSession() {
       const track = Spicetify.Player.data.item;
