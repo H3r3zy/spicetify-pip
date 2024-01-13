@@ -8,7 +8,6 @@ async function main() {
 
   const video = document.createElement('video');
   video.srcObject = canvas.captureStream();
-  video.controls = true;
 
   await changeCanvasTrack();
 
@@ -77,29 +76,19 @@ async function main() {
     context.fillRect(0, 502, 512 * progress, 10);
   }
 
-  const save = navigator.mediaSession.setActionHandler;
-  navigator.mediaSession.setActionHandler = function() {
-    save.apply(this, arguments);
-  };
-
   function setActionHandler() {
     navigator.mediaSession.setActionHandler('play', async () => {
       await video.play();
-      await Spicetify.Player.play();
+      Spicetify.Player.play();
     });
 
     navigator.mediaSession.setActionHandler('pause', async () => {
-      await video.pause();
-      await Spicetify.Player.pause();
+      video.pause();
+      Spicetify.Player.pause();
     });
 
-    navigator.mediaSession.setActionHandler('previoustrack', async () => {
-      Spicetify.Player.back();
-    });
-
-    navigator.mediaSession.setActionHandler('nexttrack', async () => {
-      Spicetify.Player.next();
-    });
+    navigator.mediaSession.setActionHandler('previoustrack', Spicetify.Player.back);
+    navigator.mediaSession.setActionHandler('nexttrack', Spicetify.Player.next);
   }
 
   async function showPictureInPictureWindow() {
@@ -107,34 +96,32 @@ async function main() {
     await changeCanvasTrack();
     await video.requestPictureInPicture();
     setActionHandler();
-    await video.play();
+    await video.play(); // play is required to show at least a frame
     if (!Spicetify.Player.isPlaying()) {
-      await video.pause();
+      video.pause();
     }
   }
 
-  Spicetify.Player.addEventListener('songchange', async ({ data }) => {
+  Spicetify.Player.addEventListener('songchange', () => {
     setMediaSession();
-    await changeCanvasTrack();
+    changeCanvasTrack();
   });
 
+  Spicetify.Player.addEventListener('onprogress', changeCanvasProgress);
 
   // Play/Pause
   Spicetify.Player.addEventListener('onplaypause', async ({ data }) => {
     if (data.isPaused) {
-      await video.pause();
+      video.pause();
+      navigator.mediaSession.playbackState = 'paused';
     } else {
       await video.play();
+      navigator.mediaSession.playbackState = 'playing';
     }
   });
 
-  // Progress (bottom bar feedback)
-  Spicetify.Player.addEventListener('onprogress', async ($event) => {
-    await changeCanvasProgress();
-  });
-
   // Pip button
-  const icon = `<svg xmlns="http://www.w3.org/2000/svg" width="17px" height="17px" viewBox="0 0 16 16" fill="#fff" class="bi bi-pip">
+  const icon = `<svg xmlns="http://www.w3.org/2000/svg" width="17px" height="17px" viewBox="0 0 16 16" class="bi bi-pip Svg-img-icon-small">
 <path d="M0 3.5A1.5 1.5 0 0 1 1.5 2h13A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 0 12.5v-9zM1.5 3a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5h13a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-13z"/>
 <path d="M8 8.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 .5.5v3a.5.5 0 0 1-.5.5h-5a.5.5 0 0 1-.5-.5v-3z"/>
 </svg>`
